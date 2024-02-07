@@ -2,6 +2,7 @@ package hexlet.code;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class App {
     // Нужно указывать базовое исключение,
@@ -15,10 +16,30 @@ public class App {
                 statement.execute(sql);
             }
 
-            var sql2 = "INSERT INTO users (username, phone) VALUES ('tommy', '123456789')";
-            try (var statement2 = conn.createStatement()) {
-                statement2.executeUpdate(sql2);
+            var sql2 = "INSERT INTO users (username, phone) VALUES (?, ?)";
+            try (var statement2 = conn.prepareStatement(sql2, Statement.RETURN_GENERATED_KEYS)) {
+                statement2.setString(1, "tommy");
+                statement2.setString(2, "123456789");
+                statement2.executeUpdate();
+
+                statement2.setString(1, "michael");
+                statement2.setString(2, "89262864405");
+                statement2.executeUpdate();
+
+                var generatedKeys = statement2.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    System.out.println(generatedKeys.getLong(1));
+                } else {
+                    throw new SQLException("DB have not returned an id after saving the entity");
+                }
             }
+
+            var sql4 = "DELETE FROM users Where username = ?;";
+            try (var preparedStatement = conn.prepareStatement(sql4)){
+                preparedStatement.setString(1, "tommy");
+                preparedStatement.executeUpdate();
+            }
+
 
             var sql3 = "SELECT * FROM users";
             try (var statement3 = conn.createStatement()) {
