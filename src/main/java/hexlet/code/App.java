@@ -12,23 +12,22 @@ public class App {
         var user1 = new User("tommy", "123456789");
         var user2 = new User("michael", "89262864405");
         var user3 = new User("fedya", "88005353535");
-        try (var conn = DriverManager.getConnection("jdbc:h2:mem:hexlet_test")) {
+        try (var conn = DB.connect()) {
 
             var dao = new UserDAO(conn);
-            var sql = "CREATE TABLE users (id BIGINT PRIMARY KEY AUTO_INCREMENT, username VARCHAR(255), phone VARCHAR(255))";
-            try (var statement = conn.createStatement()) {
-                statement.execute(sql);
-            }
+        //    var sql = "CREATE TABLE users (id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY, username VARCHAR(255), phone VARCHAR(255))";
+        //    try (var statement = conn.createStatement()) {
+        //        statement.execute(sql);
+        //    }
             dao.save(user1);
             dao.save(user2);
+            user2.setUsername("Gennadiy");
+            dao.save(user2);
+            dao.getEntities();
 
-            user1.setUsername("TOMMY");
-            dao.save(user1);
-            dao.save(user3);
-            dao.getEntities();
-            dao.delete(2);
-            dao.getEntities();
-          
+            System.out.println(user1.getId() + " " + user1.getUsername() + " ");
+            System.out.println(user2.getId() + " " + user2.getUsername() + " ");
+            System.out.println(user3.getId() + " " + user3.getUsername() + " "); 
         }
     }
 } 
